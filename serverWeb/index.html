@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src=/socket.io/socket.io.js></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js></script>
+    
+    <script>
+    var socket = io('http://localhost:3000');
+    var lstrgSocketidClient;
+    
+    
+    //Se já foi gravado o SocketidClient eu escondo o botão
+    socket.on('lbolSocketidClient', function(objSocketidClient){
+
+      if(objSocketidClient.lstrgSocketServer){
+          $('#btnEnviarId').hide();
+          $('#btnLigar').show();
+          $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');  
+
+      };
+      
+    });    
+    
+    socket.on('ligar', function(objSocketidClient){
+      lstrgSocketidClient = objSocketidClient.lstrgSocketServer;
+      
+      //Aqui é o pulo do gato!
+      //Eu comparo se o socketIdClient gravado na primeira vez.
+      //É a instancia de navegador que estou no momento?
+      //Se for, fechou! eu dou um post para um serviço local RaspBerry
+      //Que aciona qualquer dispositivo!
+      if(socket.id === lstrgSocketidClient){
+            // envia um post maroto local service node.js ajax
+            $.ajax ({
+                url: 'http://localhost:3012',
+                type: "POST",
+                data: JSON.stringify({data:"test"}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(lblLigou){
+                    if(lblLigou.acendeu)
+                        alert('Acendeu');
+                }
+            });            
+      };      
+    });    
+    
+    $(function(){
+        $('#btnEnviarId').click(function(){
+            socket.emit('setIdServer', {'socketIdClient':socket.id});
+            $('#btnEnviarId').hide(); //.attr('disabled', 'disabled');
+            alert('Nao feche esta aba do seu navegador!');
+            return false;
+        });
+
+        $('#btnLigar').click(function(){
+            socket.emit('ligar', socket.id);
+            return false;
+        }); 
+        
+        $('#btnLigar').hide();   
+        $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
+    
+    });
+    
+    </script>
+  </head>
+  <body>
+    <p id="mensagem"></p>
+    <input type="button" value="Autenticar id servidor" id="btnEnviarId" >
+    <input type="button" value="Ligar a Lampada!" id="btnLigar" >  
+  </body>
+</html>
