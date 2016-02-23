@@ -1,0 +1,11 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "App para socket by uncle jussa - heroku restart -a socket",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "juscilan.com",
+  "license": "ISC"
+}
