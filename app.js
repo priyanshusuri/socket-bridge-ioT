@@ -1,3 +1,4 @@
+/*
 const http = require('http');
 //const port = 1225;//process.env.PORT;
 const port = process.env.PORT || 3003;
@@ -8,4 +9,11 @@ http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('Hello World\n');
 }).listen(port);
+*/
+http.createServer(function(req, res){
 
+        res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
+        //res.write(data);
+        res.end('testing anyway..');
+
+}).listen(process.env.PORT ||3000);
