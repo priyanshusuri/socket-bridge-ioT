@@ -12,9 +12,6 @@ http.createServer(function (req, res) {
 }).listen(port);
 */
 http.createServer(function(req, res){
-
-        res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
-        //res.write(data);
-        res.end('testing anyway..');
+   res.end('testing anyway..');
 
 }).listen(process.env.PORT ||3000);
