@@ -1,9 +1,16 @@
-//Este server preferencialmente deverá rodar no raspberry pi
+/*
+Este server preferencialmente deverá rodar no raspberry pi
+Ele fará a execucao de acoes no embarcado.
+*/
+
+
 var express = require('express');
 var app = express();
 
+/*
 var five = require("johnny-five");
 var board = new five.Board();
+*/
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -23,7 +30,7 @@ app.post('/', function(req, res, next) {
         relay: relay
     });  
     */  
-    console.log('implementar o janny-five');
+    console.log('implementar o janny-five' + ' Hora ' + Date());
     res.status(200).json({ acendeu: true });
 });
 
