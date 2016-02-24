@@ -15,23 +15,43 @@ function index(req, res){
 };
 
 //Global manter o lstrgSocketidClient connection master
-lstrgSocketidClient ='';
+var lstrgSocketidClient ='';
 
 // Iniciando Socket
-// Evento connection ocorre quando entra um novo usuário.
 io.on('connection', function(socket){
 
     socket.on('setIdServer', function(socket){
-        if (!lstrgSocketidClient)
-            lstrgSocketidClient = socket.socketIdClient;
-        //Ternary
-        //lstrgSocketidClient = (!lstrgSocketidClient) ? socket.socketIdClient : lstrgSocketidClient;
+        if (!lstrgSocketidClient){
+            fs.writeFile(__dirname +'configuration.json', socket.socketIdClient, function (err) {
+            if (err) return console.log(err);
+            });            
+        }
+        lstrgSocketidClient = socket.socketIdClient;
     });   
 
     socket.on('ligar', function(visitas){
+        fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log(data);
+        lstrgSocketidClient = data;
         socket.broadcast.emit('ligar', {'lstrgSocketServer':lstrgSocketidClient});
+        });        
+        
     });
     
-    socket.emit('lbolSocketidClient', {'lstrgSocketServer':lstrgSocketidClient});    
+    socket.on('ligar', function(visitas){
+        fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log(data);
+        socket.emit('lbolSocketidClient', {'lstrgSocketServer':data});
+        });        
+        
+    });    
+    
+    //socket.emit('lbolSocketidClient', {'lstrgSocketServer':lstrgSocketidClient});    
    
 });
