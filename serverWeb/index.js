@@ -22,7 +22,7 @@ io.on('connection', function(socket){
 
     socket.on('setIdServer', function(socket){
         if (!lstrgSocketidClient){
-            fs.writeFile(__dirname +'configuration.json', socket.socketIdClient, function (err) {
+            fs.writeFile(__dirname +'/configuration.json', socket.socketIdClient, function (err) {
             if (err) return console.log(err);
             });            
         }
@@ -34,6 +34,7 @@ io.on('connection', function(socket){
         if (err) {
             return console.log(err);
         }
+        
         console.log(data);
         lstrgSocketidClient = data;
         socket.broadcast.emit('ligar', {'lstrgSocketServer':lstrgSocketidClient});
@@ -41,16 +42,18 @@ io.on('connection', function(socket){
         
     });
     
-    socket.on('ligar', function(visitas){
-        fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log(data);
+    //socket.on('lbolSocketidClient', function(visitas){
+    fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
+    if (err) {
+        return console.log(err);
+    }
+    console.log(data);
+    
+    if(data)
         socket.emit('lbolSocketidClient', {'lstrgSocketServer':data});
-        });        
+    });        
         
-    });    
+    //});    
     
     //socket.emit('lbolSocketidClient', {'lstrgSocketServer':lstrgSocketidClient});    
    
