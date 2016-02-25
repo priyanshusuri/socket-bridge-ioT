@@ -8,7 +8,8 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script>
         
-        var adress = 'http://skt-test.herokuapp.com/';
+        //var adress = 'http://skt-test.herokuapp.com/';
+        var adress = 'http://localhost:3000';
         var adressLocal = 'http://localhost:3012';
         
         var socket = io(adress);
@@ -37,6 +38,8 @@
 
         if(socket.id === lstrgSocketidClient){
                 // envia um post maroto local service node.js ajax
+                $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
+                /*
                 $.ajax ({
                     url: adressLocal,
                     type: "POST",
@@ -48,7 +51,8 @@
                             //alert('Acendeu');
                             $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
                     }
-                });            
+                }); 
+                */           
             };      
         }); 
     
@@ -62,7 +66,7 @@
             $('#btnEnviarId').click(function(){
                 socket.emit('setIdServer', {'socketIdClient':socket.id});
                 $('#btnEnviarId').hide(); //.attr('disabled', 'disabled');
-                alert('Nao feche esta aba do seu navegador!');
+                //alert('Nao feche esta aba do seu navegador!');
                 return false;
             });
 
@@ -71,6 +75,11 @@
                 return false;
             }); 
             
+            $('#btnErase').click(function(){
+                socket.emit('Erase', socket.id);
+                return false;
+            });
+                        
             $('#btnLigar').hide();   
             $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
         
@@ -82,7 +91,8 @@
     <div class="container-fluid">
         <p id="mensagem"></p>
         <input type="button" class="btn btn-primary btn-large" value="Autenticar id servidor" id="btnEnviarId" >
-        <input type="button" class="btn btn-primary btn-large" value="Ligar" id="btnLigar" >  
+        <input type="button" class="btn btn-primary btn-large" value="Ligar" id="btnLigar" >
+        <input type="button" class="btn btn-primary btn-large" value="EraseData" id="btnErase" >   
         <p id="log"></p>
     </div>
   </body>

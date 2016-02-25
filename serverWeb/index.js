@@ -26,6 +26,7 @@ io.on('connection', function(socket){
             if (err) return console.log(err);
             });            
         }
+        console.log('Gravou ' + __dirname +'/configuration.json');
         lstrgSocketidClient = socket.socketIdClient;
     });   
 
@@ -41,6 +42,11 @@ io.on('connection', function(socket){
         });        
         
     });
+
+    socket.on('Erase', function(visitas){
+        fs.unlinkSync(__dirname + '/configuration.json')
+    });
+
     
     //socket.on('lbolSocketidClient', function(visitas){
     fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
