@@ -4,7 +4,7 @@ var app = require('http').createServer(index)
   , fs = require('fs')
 ;
 app.listen(process.env.PORT ||3000, function() {
-  console.log("Servidor rodando!" + process.env.PORT);
+  console.log("Servidor rodando!" + process.env.PORT ||3000);
 });
 
 function index(req, res){
@@ -14,31 +14,30 @@ function index(req, res){
   });
 };
 
-//Global manter o lstrgSocketidClient connection master
-var lstrgSocketidClient ='';
+/*
+var io = require('socket.io')(app, {
+  path: '/socket.io-client'
+});*/
+//io.set('transports', ['websocket']);
 
 // Iniciando Socket
 io.on('connection', function(socket){
 
     socket.on('setIdServer', function(socket){
-        if (!lstrgSocketidClient){
-            fs.writeFile(__dirname +'/configuration.json', socket.socketIdClient, function (err) {
+        //Gravar em arquivo a sessionId master
+        fs.writeFile(__dirname +'/configuration.json', socket.socketIdClient, function (err) {
             if (err) return console.log(err);
-            });            
-        }
-        console.log('Gravou ' + __dirname +'/configuration.json');
-        lstrgSocketidClient = socket.socketIdClient;
+        });            
     });   
 
     socket.on('ligar', function(visitas){
+         //Recupera em arquivo a sessionId master
         fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
         }
         
-        console.log(data);
-        lstrgSocketidClient = data;
-        socket.broadcast.emit('ligar', {'lstrgSocketServer':lstrgSocketidClient});
+        socket.broadcast.emit('ligar', {'lstrgSocketServer':data});
         });        
         
     });
@@ -48,7 +47,8 @@ io.on('connection', function(socket){
     });
 
     
-    //socket.on('lbolSocketidClient', function(visitas){
+    //Agum navegador entrou no socket?
+    //Emite o lbolSocketidClient
     fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
     if (err) {
         return console.log(err);
@@ -58,9 +58,5 @@ io.on('connection', function(socket){
     if(data)
         socket.emit('lbolSocketidClient', {'lstrgSocketServer':data});
     });        
-        
-    //});    
-    
-    //socket.emit('lbolSocketidClient', {'lstrgSocketServer':lstrgSocketidClient});    
    
 });

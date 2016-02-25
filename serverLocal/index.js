@@ -34,5 +34,21 @@ app.post('/', function(req, res, next) {
     res.status(200).json({ acendeu: true });
 });
 
+app.get('/', function(req, res, next) {
+  /*
+  var relay = new five.Relay(10);
+
+   relay.on();
+  
+   //relay.off();
+  
+    this.repl.inject({
+        relay: relay
+    });  
+    */  
+    console.log('implementar o janny-five' + ' Hora ' + Date());
+    res.status(200).json({ acendeu: true });
+});
+
 console.log('Rodando na porta local: ' + '3012');
-app.listen(3012);
+app.listen(3013);
