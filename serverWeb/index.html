@@ -8,45 +8,25 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script>
         
-        var adress = 'http://skt-test.herokuapp.com/';
-        //var adress = 'http://localhost:3000';
-        var adressLocal = 'http://localhost:3012';
-        
-        var socket = io(adress);
         var lstrgSocketidClient;
+        var socket = io.connect();
         
-        socket.connect();
-        /*
-        socket.connect(adress, {
-            'reconnect': true,
-            'reconnection delay': 500,
-            'max reconnection attempts': 10
-        });        
-        */
-        
-        //Se já foi gravado o SocketidClient eu escondo o botão
-        socket.on('lbolSocketidClient', function(objSocketidClient){
-
-            if(objSocketidClient.lstrgSocketServer){
-                $('#btnEnviarId').hide();
-                $('#btnLigar').show();
-                $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');  
-                $('#btnErase').show();
-            };
-        
-        });    
-    
-        socket.on('ligar', function(objSocketidClient){
-            lstrgSocketidClient = objSocketidClient.lstrgSocketServer;
+        socket.on('pong-um', function(recebe){
             
-            //Aqui é o pulo do gato!
-            //Eu comparo se o socketIdClient gravado é da master
-            //Se for, fechou! eu dou um post para um serviço local RaspBerry
-            //Que aciona qualquer dispositivo!
+            if(recebe.sessionid){
+                socket.emit('ping-um', recebe);
+            }else{
+                socket.emit('ping-um', {"sessionid":socket.id}); 
+            }
+                        
+        });             
 
-            if(socket.id === lstrgSocketidClient){
+        socket.on('ligar', function(objSocketidClient){
+
+            //Aqui é o pulo do gato!
+            if(socket.id === objSocketidClient.sessionid){
                 
-                $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
+                $('#log').html($('#log').html() + '<br>' + 'On ' + Date());
                 /*
                 // envia um post maroto local service node.js ajax
                 $.ajax ({
@@ -64,36 +44,46 @@
                 */           
             };      
         }); 
-    
+        
+        socket.on('pong-id', function(objSocketidClient){
+            
+            if(objSocketidClient){
+                if(objSocketidClient.sessionid){
+                    $('#btnEnviarId').hide();
+                    $('#btnErase').hide();
+                    $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');   
+                };                   
+            }    
    
+
+        });         
+
     
         $(function(){
+            
             $('#btnEnviarId').click(function(){
-                socket.emit('setIdServer', {'socketIdClient':socket.id});
+                socket.emit('ping-um', {"sessionid":null});
                 $('#btnEnviarId').hide();
-                $('#btnErase').show(); 
-                //localStorage.setItem('socketIdClient', socket.id);
+                $('#btnErase').show();
                 return false;
             });
-
+            
             $('#btnLigar').click(function(){
-                socket.emit('ligar', socket.id);
+                socket.emit('ligar', null);
                 return false;
-            }); 
+            });                           
             
             $('#btnErase').click(function(){
-                socket.emit('Erase', socket.id);
+                socket.emit('erase', socket.id);
                 return false;
-            });
+            });            
             
-            /*if(localStorage.getItem('socketIdClient')){
-                $('#btnErase').show();
-            }*/
-                        
-            $('#btnLigar').hide();
-            $('#btnErase').hide();   
+            socket.emit('ping-id', null);
+
+            //$('#btnErase').hide();
+            //$('#btnEnviarId').hide();      
             $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
-        
+            
         });
     
     </script>
@@ -101,9 +91,9 @@
   <body>
     <div class="container-fluid">
         <p id="mensagem"></p>
+        <input type="button" class="btn btn-primary btn-large" value="EraseData" id="btnErase" >
         <input type="button" class="btn btn-primary btn-large" value="Autenticar id servidor" id="btnEnviarId" >
         <input type="button" class="btn btn-primary btn-large" value="Ligar" id="btnLigar" >
-        <input type="button" class="btn btn-primary btn-large" value="EraseData" id="btnErase" >   
         <p id="log"></p>
     </div>
   </body>

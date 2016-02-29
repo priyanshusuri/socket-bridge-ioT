@@ -51,4 +51,4 @@ app.get('/', function(req, res, next) {
 });
 
 console.log('Rodando na porta local: ' + '3012');
-app.listen(3013);
+app.listen(3012);
