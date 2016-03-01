@@ -1,69 +1,54 @@
-// Server basicao
-var app = require('http').createServer(index)
-  , io = require('socket.io').listen(app)
-  , fs = require('fs')
-;
-app.listen(process.env.PORT ||3000, function() {
-  console.log("Servidor rodando! porta: " + process.env.PORT ||3000);
-});
+var express = require("express");
+var fs = require('fs');
+var app = express();
+var port = process.env.PORT ||3000;
+var io = require('socket.io').listen(app.listen(port));
 
-function index(req, res){
+var socketID = null;
+ 
+app.get("/", function(req, res){
   fs.readFile(__dirname + '/index.html', function(err, data){
 	res.writeHead(200);
     res.end(data);
-  });
-};
+    });
+});   
 
-/*
-var io = require('socket.io')(app, {
-  path: '/socket.io-client'
-});*/
-//io.set('transports', ['websocket']);
-/*
-io.set('transports', ['xhr-polling']);
-io.set('polling duration', 10);
-*/
+app.get("/:id", function(req, res){
+    if(req.params.id == 'reset'){
+        socketID = null;
+        res.writeHead(200);
+        res.end('Resetado');        
+    }
+    res.writeHead(404);
+    res.end('File not found');     
+});   
 
-var dadosId;
 
-// Iniciando Socket
+ 
+// Iniciando Socket Server
 io.on('connection', function(socket){
     
-    socket.on('ping-um', function(data){
-        
-        if(dadosId){
-            sleep(2000);
-            socket.emit('pong-um', dadosId);
-            return;
-        }
-        
-        if(data.sessionid)
-            dadosId = data;
-                
-        //sleep(2000);
-        socket.emit('pong-um', data);
+    socket.on('ping', function(dados){
+        socketID = {'sessionid':dados};
+        socket.emit('pong', socketID);
+    });     
+
+    socket.on('setIdServer', function(socket){
+        //Gravar em arquivo a socketIdClient da master na variavel socketID
+        socketID = {'sessionid':socket.socketIdClient};            
+    });   
+
+    socket.on('ligar', function(visitas){
+        socket.broadcast.emit('ligar', socketID);
     });
     
-    socket.on('ligar', function(visitas){
-        socket.broadcast.emit('ligar', dadosId);
-    }); 
-    
-    socket.on('erase', function(visitas){
-        dadosId = null;
-    });    
+    //Agum navegador entrou no socket?
+    //Emite o lbolSocketidClient para avisar que a instancia sera um client
+    if(socketID)
+        socket.emit('isServer', {'sessionid':socketID});
+    });
+            
+console.log("Listening on port " + port);
 
-    socket.on('ping-id', function(){
-        console.log(dadosId);
-        socket.emit('pong-id', dadosId);
-    }); 
-    
-});
 
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-};
+

@@ -8,25 +8,37 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script>
         
-        var lstrgSocketidClient;
+        // Iniciando Socket Client
         var socket = io.connect();
         
-        socket.on('pong-um', function(recebe){
-            
-            if(recebe.sessionid){
-                socket.emit('ping-um', recebe);
-            }else{
-                socket.emit('ping-um', {"sessionid":socket.id}); 
-            }
-                        
+        var adressLocal = 'http://localhost:3012'
+        
+        //Se já foi gravado o sessionid eu renderizo objetos do client
+        socket.on('isServer', function(objSocketidClient){
+
+            if(objSocketidClient.sessionid){
+                $('#btnEnviarId').hide();
+                $('#btnLigar').show();
+                $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');  
+            };
+        
+        });  
+
+        socket.on('pong', function(data){
+            sleep(2000);
+            socket.emit('ping', {'sessionid':socket.id});
         });             
 
         socket.on('ligar', function(objSocketidClient){
-
-            //Aqui é o pulo do gato!
+            
+            if(!objSocketidClient)
+                return;
+            
+            //Aqui eu comparo se o socketIdClient gravado é da master
             if(socket.id === objSocketidClient.sessionid){
                 
                 $('#log').html($('#log').html() + '<br>' + 'On ' + Date());
+                
                 /*
                 // envia um post maroto local service node.js ajax
                 $.ajax ({
@@ -44,56 +56,45 @@
                 */           
             };      
         }); 
-        
-        socket.on('pong-id', function(objSocketidClient){
-            
-            if(objSocketidClient){
-                if(objSocketidClient.sessionid){
-                    $('#btnEnviarId').hide();
-                    $('#btnErase').hide();
-                    $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');   
-                };                   
-            }    
-   
-
-        });         
-
     
         $(function(){
             
             $('#btnEnviarId').click(function(){
-                socket.emit('ping-um', {"sessionid":null});
+                socket.emit('setIdServer', {'socketIdClient':socket.id});
+                socket.emit('ping', {});
                 $('#btnEnviarId').hide();
                 $('#btnErase').show();
                 return false;
             });
-            
-            $('#btnLigar').click(function(){
-                socket.emit('ligar', null);
-                return false;
-            });                           
-            
-            $('#btnErase').click(function(){
-                socket.emit('erase', socket.id);
-                return false;
-            });            
-            
-            socket.emit('ping-id', null);
 
-            //$('#btnErase').hide();
-            //$('#btnEnviarId').hide();      
-            $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
+            $('#btnLigar').click(function(){
+                socket.emit('ligar', socket.id);
+                return false;
+            }); 
             
+            $('#btnLigar').hide();
+            $('#btnErase').hide();   
+            $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
+        
+            //socket.emit('ping', {});
         });
-    
+        
+        function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds){
+                break;
+                }
+            }
+        };         
+            
     </script>
   </head>
   <body>
     <div class="container-fluid">
         <p id="mensagem"></p>
-        <input type="button" class="btn btn-primary btn-large" value="EraseData" id="btnErase" >
-        <input type="button" class="btn btn-primary btn-large" value="Autenticar id servidor" id="btnEnviarId" >
-        <input type="button" class="btn btn-primary btn-large" value="Ligar" id="btnLigar" >
+        <input type="button" class="btn btn-primary btn-large" value="Autenticar socket.id no servidor" id="btnEnviarId" >
+        <input type="button" class="btn btn-primary btn-large" value="Ligar Dispositivo Remoto" id="btnLigar" >
         <p id="log"></p>
     </div>
   </body>

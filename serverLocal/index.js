@@ -2,11 +2,8 @@
 Este server preferencialmente deverá rodar no raspberry pi
 Ele fará a execucao de acoes no embarcado.
 */
-
-
 var express = require('express');
 var app = express();
-
 /*
 var five = require("johnny-five");
 var board = new five.Board();
