@@ -10,24 +10,34 @@
         
         // Iniciando Socket Client
         var socket = io.connect();
+        var isServ ;
+        var adressLocal = 'http://localhost:3012';
+        var adressWeb   = 'http://skt-test.herokuapp.com/';
+        //var adressWeb   = 'http://localhost:3000';
         
-        var adressLocal = 'http://localhost:3012'
-        
-        //Se já foi gravado o sessionid eu renderizo objetos do client
+        //isServer é emitido no load da pagina
         socket.on('isServer', function(objSocketidClient){
 
             if(objSocketidClient.sessionid){
                 $('#btnEnviarId').hide();
                 $('#btnLigar').show();
                 $('#mensagem').css("color","#0000FF"); 
-                $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');  
+                $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');
+                isServ = false;  
             };
         
         });  
 
         socket.on('pong', function(data){
-            sleep(2000);
-            socket.emit('ping', {'sessionid':socket.id});
+            
+            if(isServ){
+                EnviaPost({"sessionid":socket.id});
+            }
+            
+            socket.emit('ping', {"sessionid":socket.id});
+            
+            sleep(2000);            
+            
         });             
 
         socket.on('ligar', function(objSocketidClient){
@@ -56,12 +66,27 @@
                 }); 
                 */           
             };      
-        }); 
+        });
+        
+        function EnviaPost(sessionID){
+            // envia um post maroto local service node.js ajax
+            $.ajax ({
+                url: adressWeb,
+                type: "POST",
+                data: JSON.stringify(sessionID),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(lblLigou){
+                    if(lblLigou == 'Setado')
+                        $('#log').html($('#log').html() + '<br>' + 'Postou ID! ' + Date());
+                }
+            });            
+        } 
     
         $(function(){
             
             $('#btnEnviarId').click(function(){
-                socket.emit('setIdServer', {'sessionid':socket.id});
+                isServ = true;
                 socket.emit('ping', {});
                 $('#btnEnviarId').hide();
                 $('#btnErase').show();

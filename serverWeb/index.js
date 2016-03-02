@@ -4,8 +4,11 @@ var app = express();
 var port = process.env.PORT ||3000;
 var io = require('socket.io').listen(app.listen(port));
 var http = require('http');
+var bodyParser = require('body-parser');
 
-var socketID = null;
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
  
 app.get("/", function(req, res){
   fs.readFile(__dirname + '/index.html', function(err, data){
@@ -14,39 +17,47 @@ app.get("/", function(req, res){
     });
 });   
 
+app.post("/", function(req, res){
+    
+    if(!process.env['SESSIONID']){
+        process.env['SESSIONID'] = JSON.stringify(req.body);
+    }
+    res.writeHead(200);
+    res.end('Set ok');     
+});
+
 app.get("/:id", function(req, res){
     if(req.params.id == 'reset'){
-        fs.unlinkSync(__dirname + '/configuration.json');
+        process.env['SESSIONID'] =null;
+        //fs.unlinkSync(__dirname + '/_config.dat');
         res.writeHead(200);
-        res.end('Resetado ');        
+        res.end('Reset ok');        
     }
-    res.writeHead(404);
-    res.end('File not found');     
+    else{
+        res.writeHead(404);
+        res.end('File not found');           
+    }
+  
 });   
 
 app.get("/:id/:id", function(req, res){
-    fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
-    if (err) {
-       res.writeHead(404);
-       res.end('not found');
-    }
+     
     res.writeHead(200);
-    res.end(data);        
-  });  
-}); 
+    
+    if(process.env['SESSIONID']){
+        res.end(JSON.stringify(process.env['SESSIONID']) + ' Porta: ' + port );        
+    }else
+        res.end('SESSIONID not found!');
+    
+});  
 
  
 // Iniciando Socket Server
 io.on('connection', function(socket){
    
     socket.on('ping', function(dados){
-        fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            socket.emit('pong', JSON.parse(data));
-        });
-        
+        socket.emit('pong', JSON.parse(process.env['SESSIONID']));
+        /*
         http.get({
             hostname: 'localhost',
             port: port,
@@ -56,31 +67,21 @@ io.on('connection', function(socket){
                 console.log(res);
             // Do stuff with response
         })
+        */
     });   
      
-
-    socket.on('setIdServer', function(socket){
-        fs.writeFile(__dirname +'/configuration.json', JSON.stringify(socket), function (err) {
-            if (err) return console.log(err);
-        });            
-    });   
-
     socket.on('ligar', function(visitas){
-        fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            socket.broadcast.emit('ligar',  JSON.parse(data));
-        });            
+        socket.broadcast.emit('ligar',  JSON.parse(process.env['SESSIONID']));            
     });   
- 
-     //Agum navegador entrou no socket?
-    fs.readFile(__dirname + '/configuration.json', 'utf8', function (err,data) {
-        if (!err) {
-            socket.emit('isServer',  JSON.parse(data));
-        }
-    });
 
+
+    //Agum navegador entrou no socket? Envia page load
+    if(process.env['SESSIONID']){
+       socket.emit('isServer',  JSON.parse(process.env['SESSIONID'])); 
+    }else{
+       socket.emit('isServer',  {"sessionid":null}); 
+    }
+    
+    
  });
-
-console.log('Running port ' + port)
+console.log('Running port ' + port )
