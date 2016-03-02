@@ -19,6 +19,7 @@
             if(objSocketidClient.sessionid){
                 $('#btnEnviarId').hide();
                 $('#btnLigar').show();
+                $('#mensagem').css("color","#0000FF"); 
                 $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');  
             };
         
@@ -60,7 +61,7 @@
         $(function(){
             
             $('#btnEnviarId').click(function(){
-                socket.emit('setIdServer', {'socketIdClient':socket.id});
+                socket.emit('setIdServer', {'sessionid':socket.id});
                 socket.emit('ping', {});
                 $('#btnEnviarId').hide();
                 $('#btnErase').show();
@@ -73,7 +74,8 @@
             }); 
             
             $('#btnLigar').hide();
-            $('#btnErase').hide();   
+            $('#btnErase').hide();
+            $('#mensagem').css("color","#FF0000");   
             $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
         
             //socket.emit('ping', {});
