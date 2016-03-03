@@ -40,27 +40,12 @@ app.get("/:id", function(req, res){
   
 });   
 
-//
-/*
-app.get("/:id/:id", function(req, res){
-     
-    res.writeHead(200);
-    
-    if(process.env['SESSIONID']){
-        res.end(JSON.stringify(process.env['SESSIONID']) + ' Porta: ' + port );        
-    }else
-        res.end('SESSIONID not found!');
-    
-});
-*/  
-
- 
 // Iniciando Socket Server
 io.on('connection', function(socket){
    
     // Ping-pong utilizado para manter a conexão com o PaaS
-    socket.on('ping', function(dados){
-        socket.emit('pong', JSON.parse(process.env['SESSIONID']));
+    socket.on('ping', function(){
+        socket.emit('pong', {});
     });   
     
     // Executa a ação 

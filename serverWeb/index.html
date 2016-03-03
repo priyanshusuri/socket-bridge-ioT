@@ -46,12 +46,11 @@
         });  
 
         // Ping-pong utilizado para manter a conexão com o PaaS    
-        socket.on('pong', function(data){
+        socket.on('pong', function(){
             
             if(isServ){
                 EnviaPost({"sessionid":socket.id});
                 socket.emit('ping', {"sessionid":socket.id});
-                //sleep(1000); 
             }
 
         });             
@@ -63,7 +62,7 @@
             if(isServ && dataAction){    
                 
                 //Grava um log
-                $('#log').html($('#log').html() + '<br>' + 'On ' + Date());
+                //$('#log').html($('#log').html() + '<br>' + 'On ' + Date());
 
                 // envia um post para uma api rest LOCAL rodando node.js via ajax
                 $.ajax ({
@@ -157,16 +156,6 @@
             $('#mensagem').text('Instância bridge não fechar essa aba e nem recarregar. App ponte socket rodando...');  
 
         });
-        
-        //Função para causar um delay no ping-pong
-        function sleep(milliseconds) {
-        var start = new Date().getTime();
-        for (var i = 0; i < 1e7; i++) {
-            if ((new Date().getTime() - start) > milliseconds){
-                break;
-                }
-            }
-        };
         
         //função interna zerar o objeto
         function resetObject(){
