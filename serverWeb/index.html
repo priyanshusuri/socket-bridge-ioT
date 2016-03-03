@@ -36,19 +36,21 @@
         //Que aciona qualquer dispositivo!
 
         if(socket.id === lstrgSocketidClient){
-                // envia um post maroto local service node.js ajax
-                $.ajax ({
-                    url: adressLocal,
-                    type: "POST",
-                    data: JSON.stringify({data:"test"}),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function(lblLigou){
-                        if(lblLigou.acendeu)
-                            //alert('Acendeu');
-                            $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
-                    }
-                });            
+            // envia um post maroto local service node.js ajax
+            $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
+            
+            $.ajax ({
+                url: adressLocal,
+                type: "POST",
+                data: JSON.stringify({data:"test"}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(lblLigou){
+                    if(lblLigou.acendeu)
+                        $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
+                }
+            });  
+                         
             };      
         }); 
     
