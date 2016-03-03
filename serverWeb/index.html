@@ -55,8 +55,8 @@
         socket.on('pong', function(){
             
             if(isServ){
-                EnviaPost({"sessionid":socket.id});
                 socket.emit('ping', {"sessionid":socket.id});
+                EnviaPost({"sessionid":socket.id});
             }
 
         });             
@@ -79,7 +79,7 @@
                     contentType: "application/json; charset=utf-8",
                     success: function(lblLigou){
                         if(lblLigou.exec)
-                            $('#log').html($('#log').html() + '<br>' + 'Executou ' + Date());
+                            $('#log').html($('#log').html() + '<br>' + 'Executou ' + Date() + ' Objeto: ' + JSON.stringify(dataAction));
                     }
                 }); 
                          
@@ -159,7 +159,7 @@
             $('#btnDeslRele').hide();
 
             $('#mensagem').css("color","#FF0000");   
-            $('#mensagem').text('Instância bridge não fechar essa aba e nem recarregar. App ponte socket rodando...');  
+            $('#mensagem').html('Instância bridge não fechar essa aba e nem recarregar. </br> App ponte socket rodando...');  
 
         });
         

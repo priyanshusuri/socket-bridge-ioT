@@ -32,7 +32,7 @@ app.post("/", function(req, res){
 
 });
 
-// GET /:id setar a Variavel de ambiente SESSIONID
+// GET /:id Resetar a Variavel de ambiente SESSIONID
 app.get("/:id", function(req, res){
     if(req.params.id == 'reset'){
         process.env['SESSIONID'] =JSON.stringify({"sessionid":null});
@@ -50,7 +50,8 @@ app.get("/:id", function(req, res){
 io.on('connection', function(socket){
    
     // Ping-pong utilizado para manter a conexão com o PaaS
-    socket.on('ping', function(){
+    socket.on('ping', function(data){
+        process.env['SESSIONID'] =JSON.stringify(data);
         socket.emit('pong', {});
     });   
     
