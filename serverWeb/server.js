@@ -9,7 +9,8 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
- 
+
+//Servir o html estático 
 app.get("/", function(req, res){
   fs.readFile(__dirname + '/index.html', function(err, data){
 	res.writeHead(200);

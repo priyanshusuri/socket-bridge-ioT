@@ -51,7 +51,7 @@
             if(isServ){
                 EnviaPost({"sessionid":socket.id});
                 socket.emit('ping', {"sessionid":socket.id});
-                sleep(1000); 
+                //sleep(1000); 
             }
 
         });             
@@ -154,7 +154,7 @@
             $('#btnDeslRele').hide();
 
             $('#mensagem').css("color","#FF0000");   
-            $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
+            $('#mensagem').text('Instância bridge não fechar essa aba e nem recarregar. App ponte socket rodando...');  
 
         });
         
