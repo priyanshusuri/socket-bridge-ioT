@@ -110,10 +110,9 @@
         $(function(){
             
             $('#btnEnviarId').click(function(){
-                isServ = true;
                 socket.emit('ping', {});
+                isServ = true;
                 $('#btnEnviarId').hide();
-                $('#btnErase').show();
                 return false;
             });
 
