@@ -15,58 +15,73 @@
         var adressWeb   = 'http://skt-test.herokuapp.com/';
         //var adressWeb   = 'http://localhost:3000';
         
+        //Objeto js executar as acoes:
+        var objAcoes = {
+            ledon:false
+            ,ledoff:false
+            ,relon:false
+            ,reloff:false
+            ,socketid:''
+        }
+        
         //isServer é emitido no load da pagina
         socket.on('isServer', function(objSocketidClient){
 
+            //se eu ja tiver a sessionid gravada trata-se de um client    
             if(objSocketidClient.sessionid){
                 $('#btnEnviarId').hide();
-                $('#btnLigar').show();
+                
+                $('#btnLigarLed').show();
+                $('#btnDeslLed').show();
+                $('#btnLigarRele').show();
+                $('#btnDeslRele').show();               
+                
                 $('#mensagem').css("color","#0000FF"); 
                 $('#mensagem').text('Instância client remoto Execute uma ação abaixo:');
                 isServ = false;  
+            }else{
+                $('#btnEnviarId').show();
             };
         
         });  
 
+        // Ping-pong utilizado para manter a conexão com o PaaS    
         socket.on('pong', function(data){
             
             if(isServ){
                 EnviaPost({"sessionid":socket.id});
+                socket.emit('ping', {"sessionid":socket.id});
+                sleep(1000); 
             }
-            
-            socket.emit('ping', {"sessionid":socket.id});
-            
-            sleep(2000);            
-            
+
         });             
 
-        socket.on('ligar', function(objSocketidClient){
+        // Executa a ação Retorno
+        socket.on('ExecActionBack', function(dataAction){
             
-            if(!objSocketidClient)
-                return;
-            
-            //Aqui eu comparo se o socketIdClient gravado é da master
-            if(socket.id === objSocketidClient.sessionid){
+            //Aqui eu comparo se estou na instancia isServ e se tenho dataAction
+            if(isServ && dataAction){    
                 
+                //Grava um log
                 $('#log').html($('#log').html() + '<br>' + 'On ' + Date());
 
-                // envia um post maroto local service node.js ajax
+                // envia um post para uma api rest LOCAL rodando node.js via ajax
                 $.ajax ({
                     url: adressLocal,
-                    type: "GET",
-                    data: JSON.stringify({data:"test"}),
+                    type: "POST",
+                    data: JSON.stringify(dataAction),
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
                     success: function(lblLigou){
-                        if(lblLigou.acendeu)
-                            //alert('Acendeu');
-                            $('#log').html($('#log').html() + '<br>' + 'Acendeu ' + Date());
+                        if(lblLigou.exec)
+                            $('#log').html($('#log').html() + '<br>' + 'Executou ' + Date());
                     }
                 }); 
                          
             };      
         });
         
+        //Envia um post para o PaaS para manter a Session.id e a conexão...
         function EnviaPost(sessionID){
             
             $.ajax ({
@@ -75,13 +90,14 @@
                 data: JSON.stringify(sessionID),
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                success: function(lblLigou){
-                    if(lblLigou == 'Setado')
-                        $('#log').html($('#log').html() + '<br>' + 'Postou ID! ' + Date());
+                success: function(setado){
+                    if(setado == 'Set ok')
+                        $('#log').html($('#log').html() + '<br>' + 'Setado ID! ' + Date());
                 }
             });            
         } 
     
+        //Jquery onload
         $(function(){
             
             $('#btnEnviarId').click(function(){
@@ -92,19 +108,57 @@
                 return false;
             });
 
-            $('#btnLigar').click(function(){
-                socket.emit('ligar', socket.id);
+            //Acoes click botao    
+            $('#btnLigarLed').click(function(){
+                resetObject();
+                objAcoes.ledon = true;
+                objAcoes.socketid = socket.id;
+
+                socket.emit('ExecAction', objAcoes);
                 return false;
             }); 
             
-            $('#btnLigar').hide();
-            $('#btnErase').hide();
+            $('#btnDeslLed').click(function(){
+                resetObject();
+                objAcoes.ledoff = true;
+                objAcoes.socketid = socket.id;
+
+                socket.emit('ExecAction', objAcoes);
+                return false;
+            });
+            
+            $('#btnLigarRele').click(function(){
+                resetObject();
+                objAcoes.relon = true;
+                objAcoes.socketid = socket.id;
+
+                socket.emit('ExecAction', objAcoes);
+                return false;
+            }); 
+            
+            $('#btnDeslRele').click(function(){
+                resetObject();
+                objAcoes.reloff = true;
+                objAcoes.socketid = socket.id;
+
+                socket.emit('ExecAction', objAcoes);
+                return false;
+            });                          
+            
+            //Inicia os elementos html load
+            $('#btnEnviarId').hide();
+
+            $('#btnLigarLed').hide();
+            $('#btnDeslLed').hide();
+            $('#btnLigarRele').hide();
+            $('#btnDeslRele').hide();
+
             $('#mensagem').css("color","#FF0000");   
             $('#mensagem').text('Instância client/server não fechar essa aba do navegador. App socket rodando...');  
-        
-            //socket.emit('ping', {});
+
         });
         
+        //Função para causar um delay no ping-pong
         function sleep(milliseconds) {
         var start = new Date().getTime();
         for (var i = 0; i < 1e7; i++) {
@@ -112,15 +166,29 @@
                 break;
                 }
             }
-        };         
+        };
+        
+        //função interna zerar o objeto
+        function resetObject(){
+            objAcoes = {
+                ledon:false
+                ,ledoff:false
+                ,relon:false
+                ,reloff:false
+                ,socketid:''
+            }                
+        };                 
             
     </script>
   </head>
   <body>
     <div class="container-fluid">
         <p id="mensagem"></p>
-        <input type="button" class="btn btn-primary btn-large" value="Autenticar socket.id no servidor" id="btnEnviarId" >
-        <input type="button" class="btn btn-primary btn-large" value="Ligar Dispositivo Remoto" id="btnLigar" >
+        <input type="button" class="btn btn-primary btn-large" value="Startar Servidor PaaS" id="btnEnviarId" >
+        <input type="button" class="btn btn-primary btn-large" value="Ligar Led " id="btnLigarLed" >
+        <input type="button" class="btn btn-primary btn-large" value="Desligar Led" id="btnDeslLed" >
+        <input type="button" class="btn btn-primary btn-large" value="Ligar Rele " id="btnLigarRele" >
+        <input type="button" class="btn btn-primary btn-large" value="Desligar Rele" id="btnDeslRele" >        
         <p id="log"></p>
     </div>
   </body>
