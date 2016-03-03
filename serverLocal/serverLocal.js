@@ -1,3 +1,11 @@
+/*
+Script em Js NodeJs Adaptado por Juscilan Moreto
+Responsavel por se comunicar com um dispositivo embarcado
+Arduino / Raspberry por exemplo
+2016 © - juscilan.com‎
+
+*/
+
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -11,6 +19,7 @@ app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//Libera post CORS à rota.
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -19,8 +28,9 @@ app.use(function(req, res, next) {
 
 app.post('/', function(req, res, next) {
 //Run on arduino
-
 /*
+try {
+
     var led = new five.Led(10);
     if(req.body.ledon)
         led.on();
@@ -32,7 +42,13 @@ app.post('/', function(req, res, next) {
         rel.on();
     if(req.body.reloff)
         rel.off();               
+
+    
+} catch (error) {
+    res.status(500).json(error);
+}
 */
+
     res.status(200).json({ exec: true });
     console.log(JSON.stringify(req.body));
 

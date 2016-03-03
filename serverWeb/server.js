@@ -1,3 +1,9 @@
+/*
+Script em Js NodeJs Adaptado por Juscilan Moreto
+Responsavel por implementar rotas e socket.io server
+2016 © - juscilan.com‎
+*/
+
 var port = process.env.PORT ||3000;
 var express = require("express");
 var fs = require('fs');
