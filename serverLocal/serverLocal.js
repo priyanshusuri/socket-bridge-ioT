@@ -3,23 +3,22 @@ Script em Js NodeJs Adaptado por Juscilan Moreto
 Responsavel por se comunicar com um dispositivo embarcado
 Arduino / Raspberry por exemplo
 2016 © - juscilan.com‎
-
 */
 
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+
 /*
 var five = require("johnny-five");
 var board = new five.Board();
 */
 
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-//Libera post CORS à rota.
+//CORS config.
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

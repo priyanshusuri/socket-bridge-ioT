@@ -12,9 +12,10 @@ var io = require('socket.io').listen(app.listen(port));
 var http = require('http');
 var bodyParser = require('body-parser');
 
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+var sessionID;
 
 //Servir o html estático 
 app.get("/", function(req, res){
@@ -24,18 +25,19 @@ app.get("/", function(req, res){
     });
 });   
 
+//Post para gravar a session ID na variavel
 app.post("/", function(req, res){
    
-    process.env['SESSIONID'] = JSON.stringify(req.body);
+    sessionID = JSON.stringify(req.body);
     res.writeHead(200);
     res.end('Set ok');     
 
 });
 
-// GET /:id Resetar a Variavel de ambiente SESSIONID
+// GET /:id Resetar a Variavel 
 app.get("/:id", function(req, res){
     if(req.params.id == 'reset'){
-        process.env['SESSIONID'] =JSON.stringify({"sessionid":null});
+        sessionID = JSON.stringify({"sessionid":null});
         res.writeHead(200);
         res.end('Reset ok');        
     }
@@ -51,22 +53,21 @@ io.on('connection', function(socket){
    
     // Ping-pong utilizado para manter a conexão com o PaaS
     socket.on('ping', function(data){
-        process.env['SESSIONID'] =JSON.stringify(data);
+        sessionID = JSON.stringify(data);
         socket.emit('pong', {});
     });   
     
     // Executa a ação 
     socket.on('ExecAction', function(data){
-        data.socketid = JSON.parse(process.env['SESSIONID']);
         socket.broadcast.emit('ExecActionBack',  data);            
     });   
 
     //Agum navegador entrou no socket? Envia page load
-    if(process.env['SESSIONID']){
-       socket.emit('isServer',  JSON.parse(process.env['SESSIONID'])); 
+    if(sessionID){
+       socket.emit('isServer', JSON.parse(sessionID));
     }else{
-       process.env['SESSIONID'] = JSON.stringify({"sessionid":null});
-       socket.emit('isServer',   process.env['SESSIONID']); 
+       sessionID = JSON.stringify({"sessionid":null});
+       socket.emit('isServer',   sessionID);
     }
     
     

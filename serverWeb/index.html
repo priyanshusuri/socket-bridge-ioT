@@ -13,7 +13,6 @@
         2016 © - juscilan.com‎
         */
         
-        
         // Iniciando Socket Client
         var socket = io.connect();
         var isServ ;
@@ -27,10 +26,15 @@
             ,ledoff:false
             ,relon:false
             ,reloff:false
-            ,socketid:''
         }
         
-        //isServer é emitido no load da pagina
+        //Objeto post Ajax
+        var objPost = {
+            url:''
+            ,data:{}
+        }        
+        
+        //isServer é emitido pelo socket.io no load da pagina
         socket.on('isServer', function(objSocketidClient){
 
             //se eu ja tiver a sessionid gravada trata-se de um client    
@@ -42,6 +46,7 @@
                 $('#btnLigarRele').show();
                 $('#btnDeslRele').show();               
                 
+                $('#mensagem').show(); 
                 $('#mensagem').css("color","#0000FF"); 
                 $('#mensagem').html('Instância client remoto </br> Execute uma ação abaixo:');
                 isServ = false;  
@@ -54,57 +59,45 @@
         // Ping-pong utilizado para manter a conexão com o PaaS    
         socket.on('pong', function(){
             
+            $('#mensagem').show(); 
+            
             if(isServ){
-                socket.emit('ping', {"sessionid":socket.id});
-                EnviaPost({"sessionid":socket.id});
+                socket.emit('ping', {});
+                objPost.url = adressWeb;
+                objPost.data = {"sessionid":socket.id};
+                enviaPost(objPost);
             }
 
         });             
 
         // Executa a ação Retorno
         socket.on('ExecActionBack', function(dataAction){
-            
             //Aqui eu comparo se estou na instancia isServ e se tenho dataAction
             if(isServ && dataAction){    
-                
-                //Grava um log
-                //$('#log').html($('#log').html() + '<br>' + 'On ' + Date());
-
-                // envia um post para uma api rest LOCAL rodando node.js via ajax
-                $.ajax ({
-                    url: adressLocal,
-                    type: "POST",
-                    data: JSON.stringify(dataAction),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function(lblLigou){
-                        if(lblLigou.exec)
-                            $('#log').html($('#log').html() + '<br>' + 'Executou ' + Date() + ' Objeto: ' + JSON.stringify(dataAction));
-                    }
-                    /*
-                    ,error: function(erro){
-                        $('#log').html($('#log').html() + '<br>' + 'Erro ' + Date() + ' Objeto: ' + JSON.stringify(erro));
-                    }*/
-                }); 
-                         
+                objPost.url = adressLocal;
+                objPost.data = dataAction;
+                enviaPost(objPost);
             };      
         });
         
-        //Envia um post para o PaaS para manter a Session.id e a conexão...
-        function EnviaPost(sessionID){
+        //Envia um post 
+        function enviaPost(dataPost){
             
             $.ajax ({
-                url: adressWeb,
+                url: dataPost.url,
                 type: "POST",
-                data: JSON.stringify(sessionID),
+                data: JSON.stringify(dataPost.data),
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                success: function(setado){
-                    if(setado == 'Set ok')
-                        $('#log').html($('#log').html() + '<br>' + 'Setado ID! ' + Date());
+                /*
+                success: function(dataAction){
+                    if(dataAction)
+                        $('#log').html($('#log').html() + '<br>' + 'Executou!  Objeto: ' + JSON.stringify(dataPost.data));
                 }
+                */
+
             });            
-        } 
+        }
     
         //Jquery onload
         $(function(){
@@ -118,36 +111,32 @@
 
             //Acoes click botao    
             $('#btnLigarLed').click(function(){
-                resetObject();
+                resetdataAction();
                 objAcoes.ledon = true;
-                objAcoes.socketid = socket.id;
 
                 socket.emit('ExecAction', objAcoes);
                 return false;
             }); 
             
             $('#btnDeslLed').click(function(){
-                resetObject();
+                resetdataAction();
                 objAcoes.ledoff = true;
-                objAcoes.socketid = socket.id;
 
                 socket.emit('ExecAction', objAcoes);
                 return false;
             });
             
             $('#btnLigarRele').click(function(){
-                resetObject();
+                resetdataAction();
                 objAcoes.relon = true;
-                objAcoes.socketid = socket.id;
 
                 socket.emit('ExecAction', objAcoes);
                 return false;
             }); 
             
             $('#btnDeslRele').click(function(){
-                resetObject();
+                resetdataAction();
                 objAcoes.reloff = true;
-                objAcoes.socketid = socket.id;
 
                 socket.emit('ExecAction', objAcoes);
                 return false;
@@ -161,19 +150,18 @@
             $('#btnLigarRele').hide();
             $('#btnDeslRele').hide();
 
-            $('#mensagem').css("color","#FF0000");   
+            $('#mensagem').css("color","#FF0000");
             $('#mensagem').html('Instância bridge não fechar essa aba e nem recarregar. </br> App ponte socket rodando...');  
 
         });
         
-        //função interna zerar o objeto
-        function resetObject(){
+        //função interna zerar os valores do objeto
+        function resetdataAction(){
             objAcoes = {
                 ledon:false
                 ,ledoff:false
                 ,relon:false
                 ,reloff:false
-                ,socketid:''
             }                
         };                 
             
@@ -182,12 +170,17 @@
   <body>
     <div class="container-fluid">
         <p id="mensagem"></p>
-        <input type="button" class="btn btn-primary btn-large" value="Startar Servidor PaaS" id="btnEnviarId" >
-        <input type="button" class="btn btn-primary btn-large" value="Ligar Led " id="btnLigarLed" >
-        <input type="button" class="btn btn-primary btn-large" value="Desligar Led" id="btnDeslLed" >
-        <input type="button" class="btn btn-primary btn-large" value="Ligar Rele " id="btnLigarRele" >
-        <input type="button" class="btn btn-primary btn-large" value="Desligar Rele" id="btnDeslRele" >        
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Startar Servidor PaaS" id="btnEnviarId" >
+        </br>
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Led " id="btnLigarLed" >
+        </br>
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Led" id="btnDeslLed" >
+        </br>
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Rele " id="btnLigarRele" >
+        </br>
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Rele" id="btnDeslRele" >        
         <p id="log"></p>
+        <p id="foot"><a href="http://www.juscilan.com">2016 © - juscilan.com‎</a></p>
     </div>
   </body>
 </html>
