@@ -10,10 +10,10 @@ var app = express();
 var bodyParser = require('body-parser');
 
 
-
+/*
 var five = require("johnny-five");
 var board = new five.Board();
-
+*/
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -27,9 +27,9 @@ app.use(function(req, res, next) {
 
 app.post('/', function(req, res, next) {
 //Run on arduino
-
+ /*
 try {
- 
+
     if(req.body.ledon || req.body.ledoff){
         var led = new five.Led(10);
         if(req.body.ledon)
@@ -50,7 +50,7 @@ try {
 } catch (error) {
     res.status(500).json(error);
 }
-
+*/
 
     res.status(200).json({ exec: true });
     console.log(JSON.stringify(req.body));

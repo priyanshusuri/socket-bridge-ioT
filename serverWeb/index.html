@@ -20,13 +20,13 @@
         var adressWeb   = 'http://skt-test.herokuapp.com/';
         //var adressWeb   = 'http://localhost:3000';
         
-        //Objeto js executar as acoes:
-        var objAcoes = {
-            ledon:false
-            ,ledoff:false
-            ,relon:false
-            ,reloff:false
-        }
+        //função interna zerar os valores do objeto
+        function ObjAcoes(ledon,ledoff,relon,reloff){
+             this.ledon     =ledon 
+            ,this.ledoff    =ledoff
+            ,this.relon     =relon
+            ,this.reloff    =reloff             
+        };         
         
         //Objeto post Ajax
         var objPost = {
@@ -83,20 +83,14 @@
         //Envia um post 
         function enviaPost(dataPost){
             
-            $.ajax ({
+            var objForPost = {
                 url: dataPost.url,
                 type: "POST",
                 data: JSON.stringify(dataPost.data),
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                /*
-                success: function(dataAction){
-                    if(dataAction)
-                        $('#log').html($('#log').html() + '<br>' + 'Executou!  Objeto: ' + JSON.stringify(dataPost.data));
-                }
-                */
-
-            });            
+            };
+            $.ajax (objForPost);            
         }
     
         //Jquery onload
@@ -111,36 +105,32 @@
 
             //Acoes click botao    
             $('#btnLigarLed').click(function(){
-                resetdataAction();
-                objAcoes.ledon = true;
+                var objacoes = new ObjAcoes(true,false,false,false);
 
-                socket.emit('ExecAction', objAcoes);
+                socket.emit('ExecAction', objacoes);
                 return false;
             }); 
             
             $('#btnDeslLed').click(function(){
-                resetdataAction();
-                objAcoes.ledoff = true;
+                var objacoes = new ObjAcoes(false,true,false,false);
 
-                socket.emit('ExecAction', objAcoes);
+                socket.emit('ExecAction', objacoes);
                 return false;
             });
             
             $('#btnLigarRele').click(function(){
-                resetdataAction();
-                objAcoes.relon = true;
+                var objacoes = new ObjAcoes(false,false,true,false);
 
-                socket.emit('ExecAction', objAcoes);
+                socket.emit('ExecAction', objacoes);
                 return false;
             }); 
             
             $('#btnDeslRele').click(function(){
-                resetdataAction();
-                objAcoes.reloff = true;
+                var objacoes = new ObjAcoes(false,false,false,true);
 
-                socket.emit('ExecAction', objAcoes);
+                socket.emit('ExecAction', objacoes);
                 return false;
-            });                          
+            });
             
             //Inicia os elementos html load
             $('#btnEnviarId').hide();
@@ -154,16 +144,7 @@
             $('#mensagem').html('Instância bridge não fechar essa aba e nem recarregar. </br> App ponte socket rodando...');  
 
         });
-        
-        //função interna zerar os valores do objeto
-        function resetdataAction(){
-            objAcoes = {
-                ledon:false
-                ,ledoff:false
-                ,relon:false
-                ,reloff:false
-            }                
-        };                 
+       
             
     </script>
   </head>
@@ -172,11 +153,15 @@
         <p id="mensagem"></p>
         <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Startar Servidor PaaS" id="btnEnviarId" >
         </br>
+        </br>
         <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Led " id="btnLigarLed" >
+        </br>
         </br>
         <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Led" id="btnDeslLed" >
         </br>
+        </br>
         <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Rele " id="btnLigarRele" >
+        </br>
         </br>
         <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Rele" id="btnDeslRele" >        
         <p id="log"></p>
