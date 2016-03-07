@@ -1,10 +1,10 @@
 /*
-Script em Js NodeJs Adaptado por Juscilan Moreto
+Script NodeJs Adaptado por Juscilan Moreto
 Responsavel por implementar rotas e socket.io server
 2016 © - juscilan.com‎
 */
 
-var port = process.env.PORT ||3000;
+var port = process.env.PORT || 3000;
 var express = require("express");
 var fs = require('fs');
 var app = express();
@@ -15,7 +15,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var sessionID;
+var sessionState;
 
 //Servir o html estático 
 app.get("/", function(req, res){
@@ -28,16 +28,16 @@ app.get("/", function(req, res){
 //Post para gravar a session ID na variavel
 app.post("/", function(req, res){
    
-    sessionID = JSON.stringify(req.body);
+    sessionState = JSON.stringify(req.body);
     res.writeHead(200);
     res.end('Set ok');     
 
 });
 
-// GET /:id Resetar a Variavel 
+// GET /:id Resetar a Variavel sessionState
 app.get("/:id", function(req, res){
     if(req.params.id == 'reset'){
-        sessionID = JSON.stringify({"sessionid":null});
+        sessionState = JSON.stringify({});
         res.writeHead(200);
         res.end('Reset ok');        
     }
@@ -51,24 +51,23 @@ app.get("/:id", function(req, res){
 // Iniciando Socket Server
 io.on('connection', function(socket){
    
-    // Ping-pong utilizado para manter a conexão com o PaaS
-    socket.on('ping', function(data){
-        sessionID = JSON.stringify(data);
-        socket.emit('pong', {});
+    // Manter estado das acoes    
+    socket.on('sendreq', function(data){
+        sessionState = JSON.stringify(data);
     });   
     
     // Executa a ação 
     socket.on('ExecAction', function(data){
-        console.log(JSON.stringify(data));
+        sessionState = JSON.stringify(data);
         socket.broadcast.emit('ExecActionRes',data);            
     });   
 
     //Agum navegador entrou no socket? Envia page load
-    if(sessionID){
-       socket.emit('isServer', JSON.parse(sessionID));
+    if(sessionState){
+       socket.emit('isServer', JSON.parse(sessionState));
     }else{
-       sessionID = JSON.stringify({"sessionid":null});
-       socket.emit('isServer',   sessionID);
+       sessionState = JSON.stringify({});
+       socket.emit('isServer',   sessionState);
     }
     
     

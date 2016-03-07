@@ -16,69 +16,57 @@
         // Iniciando Socket Client
         var socket = io.connect();
         var isServ ;
-        var adressLocal = 'http://localhost:3012';
-        var adressWeb   = 'http://skt-test.herokuapp.com/';
-        //var adressWeb   = 'http://localhost:3000';
+        const adressLocal = 'http://localhost:3012';
+        const adressWeb   = 'http://localhost:3000/';
         
         //Objeto interno de acoes a serem feitas no embarcado
         function ObjAcoes(ledon,ledoff,relon,reloff){
              this.ledon     = ledon 
             ,this.ledoff    = ledoff
-            ,this.relon     = relon
-            ,this.reloff    = reloff             
-        };         
+        };
+        
+        var objacoes = new ObjAcoes(false,false);         
         
         //Objeto post Ajax
-        function objPost (url,data) {
+        function ObjPost (url,data) {
              this.url       = url
             ,this.data      = data
         }        
         
         //isServer é emitido pelo socket.io no load da pagina
-        socket.on('isServer', function(objSocketidClient){
+        socket.on('isServer', function(dataAction){
 
-            //se eu ja tiver a sessionid gravada trata-se de um client    
-            if(objSocketidClient.sessionid){
-                $('#btnEnviarId').hide();
+            //se eu ja tiver o objeto SessionState trata-se de um client
+            if(Object.keys(dataAction).length > 0){
                 
-                $('#btnLigarLed').show();
-                $('#btnDeslLed').show();
-                $('#btnLigarRele').show();
-                $('#btnDeslRele').show();               
+                $('#btnSet').hide();
+                
+                $('#btnLed').show();
                 
                 $('#mensagem').show(); 
                 $('#mensagem').css("color","#0000FF"); 
                 $('#mensagem').html('Instância client remoto </br> Execute uma ação abaixo:');
-                isServ = false;  
+                
+                isServ = false; 
+                
+                objacoes =  dataAction;
+                   
             }else{
-                $('#btnEnviarId').show();
+                $('#btnSet').show();
             };
         
         });  
 
-        // Ping-pong utilizado para manter a conexão com o PaaS    
-        socket.on('pong', function(){
-            
-            $('#mensagem').show(); 
-            
-            if(isServ){
-                socket.emit('ping', {});
-                var objpost = new objPost(adressWeb,{"sessionid":socket.id})
-                enviaPost(objpost);
-            }
-
-        });             
-
-        // Executa a ação de resposta
+        // Executa a ação de resposta em BroadCast
         socket.on('ExecActionRes', function(dataAction){
-            //Aqui eu comparo se estou na instancia isServ e se tenho dataAction
-            if(isServ && dataAction){
-                var objpost = new objPost(adressLocal,dataAction)
+            //Aqui eu comparo se estou na instancia isServ
+            if(isServ){
+                var objpost = new ObjPost(adressLocal,dataAction)
                 enviaPost(objpost);
-            };      
+            }   
         });
         
-        //Envia um post 
+        //funcao interna para enviar um post 
         function enviaPost(dataPost){
             
             var objForPost = {
@@ -88,58 +76,44 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
             };
+            
             $.ajax (objForPost);            
         }
     
         //Jquery onload
         $(function(){
-            
-            $('#btnEnviarId').click(function(){
-                socket.emit('ping', {});
+
+            $('#btnSet').click(function(){
+                socket.emit('sendreq', objacoes);
                 isServ = true;
-                $('#btnEnviarId').hide();
+                $('#btnSet').hide();
                 return false;
             });
 
             //Acoes click botao    
-            $('#btnLigarLed').click(function(){
-                var objacoes = new ObjAcoes(true,false,false,false);
+            $('#btnLed').click(function(){
+                
+                objacoes = new ObjAcoes(false,false);   
+  
+                if($('#btnLed').val() == 'Ligar Led'){
+                    objacoes.ledon = true;            
+                    $('#btnLed').val('Desligar Led');
 
-                socket.emit('ExecAction', objacoes);
+                }else{
+                    objacoes.ledoff = true;   
+                    $('#btnLed').val('Ligar Led');
+          
+                }
+                socket.emit('ExecAction', objacoes);                    
+                
                 return false;
             }); 
-            
-            $('#btnDeslLed').click(function(){
-                var objacoes = new ObjAcoes(false,true,false,false);
-
-                socket.emit('ExecAction', objacoes);
-                return false;
-            });
-            
-            $('#btnLigarRele').click(function(){
-                var objacoes = new ObjAcoes(false,false,true,false);
-
-                socket.emit('ExecAction', objacoes);
-                return false;
-            }); 
-            
-            $('#btnDeslRele').click(function(){
-                var objacoes = new ObjAcoes(false,false,false,true);
-
-                socket.emit('ExecAction', objacoes);
-                return false;
-            });
             
             //Inicia os elementos html load
-            $('#btnEnviarId').hide();
-
-            $('#btnLigarLed').hide();
-            $('#btnDeslLed').hide();
-            $('#btnLigarRele').hide();
-            $('#btnDeslRele').hide();
-
+            $('#btnLed').hide();
+            
             $('#mensagem').css("color","#FF0000");
-            $('#mensagem').html('Instância bridge não fechar essa aba e nem recarregar. </br> App ponte socket rodando...');  
+            $('#mensagem').html('Instância bridge não fechar essa aba e nem recarregar. </br> App socket rodando...');  
 
         });
        
@@ -149,19 +123,10 @@
   <body>
     <div class="container-fluid">
         <p id="mensagem"></p>
-        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Startar Servidor PaaS" id="btnEnviarId" >
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Startar Servidor PaaS" id="btnSet" >
         </br>
         </br>
-        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Led " id="btnLigarLed" >
-        </br>
-        </br>
-        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Led" id="btnDeslLed" >
-        </br>
-        </br>
-        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Rele " id="btnLigarRele" >
-        </br>
-        </br>
-        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Desligar Rele" id="btnDeslRele" >        
+        <input type="button" class="btn btn-primary btn-large" style="width:100%" value="Ligar Led" id="btnLed" >
         <p id="log"></p>
         <p id="foot"><a href="http://www.juscilan.com">2016 © - juscilan.com‎</a></p>
     </div>
