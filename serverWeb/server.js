@@ -59,7 +59,8 @@ io.on('connection', function(socket){
     
     // Executa a ação 
     socket.on('ExecAction', function(data){
-        socket.broadcast.emit('ExecActionBack',  data);            
+        console.log(JSON.stringify(data));
+        socket.broadcast.emit('ExecActionRes',data);            
     });   
 
     //Agum navegador entrou no socket? Envia page load

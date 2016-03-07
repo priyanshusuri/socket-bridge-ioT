@@ -9,7 +9,7 @@
     <script>
         /*
         Script em Js NodeJs Adaptado por Juscilan Moreto
-        Responsavel por implementar rotas e socket.io server
+        Responsavel por implementar a parte client do socket.io 
         2016 © - juscilan.com‎
         */
         
@@ -20,18 +20,18 @@
         var adressWeb   = 'http://skt-test.herokuapp.com/';
         //var adressWeb   = 'http://localhost:3000';
         
-        //função interna zerar os valores do objeto
+        //Objeto interno de acoes a serem feitas no embarcado
         function ObjAcoes(ledon,ledoff,relon,reloff){
-             this.ledon     =ledon 
-            ,this.ledoff    =ledoff
-            ,this.relon     =relon
-            ,this.reloff    =reloff             
+             this.ledon     = ledon 
+            ,this.ledoff    = ledoff
+            ,this.relon     = relon
+            ,this.reloff    = reloff             
         };         
         
         //Objeto post Ajax
-        var objPost = {
-            url:''
-            ,data:{}
+        function objPost (url,data) {
+             this.url       = url
+            ,this.data      = data
         }        
         
         //isServer é emitido pelo socket.io no load da pagina
@@ -63,20 +63,18 @@
             
             if(isServ){
                 socket.emit('ping', {});
-                objPost.url = adressWeb;
-                objPost.data = {"sessionid":socket.id};
-                enviaPost(objPost);
+                var objpost = new objPost(adressWeb,{"sessionid":socket.id})
+                enviaPost(objpost);
             }
 
         });             
 
-        // Executa a ação Retorno
-        socket.on('ExecActionBack', function(dataAction){
+        // Executa a ação de resposta
+        socket.on('ExecActionRes', function(dataAction){
             //Aqui eu comparo se estou na instancia isServ e se tenho dataAction
-            if(isServ && dataAction){    
-                objPost.url = adressLocal;
-                objPost.data = dataAction;
-                enviaPost(objPost);
+            if(isServ && dataAction){
+                var objpost = new objPost(adressLocal,dataAction)
+                enviaPost(objpost);
             };      
         });
         
