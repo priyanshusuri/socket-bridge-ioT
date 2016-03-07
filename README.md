@@ -1,4 +1,4 @@
-[alt tag](https://github.com/juscilan/socket-bridge-ioT/blob/master/Diagram.png)
+![alt tag](https://github.com/juscilan/socket-bridge-ioT/blob/master/Diagram.png)
 ===========
 
 Socket-bridge-ioT
