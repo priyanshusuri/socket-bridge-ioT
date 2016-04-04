@@ -1,7 +1,7 @@
+'use strict';
 
-var http = require('http');
+const http = require('http');
 
-http.createServer(function(req, res){
-   res.end('testing anyway..');
-
-}).listen(process.env.PORT ||3000);
+http.createServer((req, res) => {
+    res.end('Testing Anyway..');
+}).listen(process.env.PORT || 3000);

@@ -1,17 +1,18 @@
 {
-  "name": "serverlocal",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "juscilan.com",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.13.4",
-    "johnny-five": "^0.9.25",
-    "serialport": "^2.0.6",
-    "body-parser": "^1.15.0"
-  }
+    "name": "serverlocal",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node serverlocal.js"
+    },
+    "author": "juscilan.com",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.13.4",
+        "johnny-five": "^0.9.25",
+        "serialport": "^2.0.6",
+        "body-parser": "^1.15.0"
+    }
 }
