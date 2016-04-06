@@ -8,14 +8,15 @@ Arduino / Raspberry por exemplo
 */
 
 const express = require('express'),
-    app = express(),
     bodyParser = require('body-parser'),
     five = require("johnny-five"),
+    app = express(),
     board = new five.Board();
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -32,8 +33,8 @@ app.post('/', (req, res, next) => {
             if (req.body.ledon) led.on();
             if (req.body.ledoff) led.off();
         }
-    } catch(error){
-         res.status(500).json(error);
+    } catch (error) {
+        res.status(500).json(error);
     }
     res.status(200).json({
         exec: true
@@ -42,6 +43,6 @@ app.post('/', (req, res, next) => {
 });
 
 
-app.listen(3012, () => {
+app.listen(3012, => {
     console.log('Rodando na porta local: ' + '3012');
 });

@@ -1,2 +1,7 @@
-serverLocal/node_modules
-serverWeb/node_modules
+node_modules
+npm-debug.log
+ntask.sqlite
+ntask_test.sqlite
+.DS_Store
+public/apidoc
+logs/*.log
