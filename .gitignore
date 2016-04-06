@@ -1,2 +1,2 @@
-serverLocal/node_modules
-serverWeb/node_modules
+node_modules
+npm-debug.log
