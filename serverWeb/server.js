@@ -7,12 +7,12 @@ Responsavel por implementar rotas e socket.io server
 */
 
 const express = require("express"),
+    port = process.env.PORT || 3000,
     fs = require('fs'),
     app = express(),
     io = require('socket.io').listen(app.listen(port)),
     http = require('http'),
-    bodyParser = require('body-parser'),
-    port = process.env.PORT || 3000;
+    bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({
     extended: true
