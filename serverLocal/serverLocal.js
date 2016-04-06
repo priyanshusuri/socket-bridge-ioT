@@ -43,6 +43,6 @@ app.post('/', (req, res, next) => {
 });
 
 
-app.listen(3012, => {
+app.listen(3012, () => {
     console.log('Rodando na porta local: ' + '3012');
 });
