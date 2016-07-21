@@ -3,7 +3,13 @@
 
 Socket-bridge-ioT
 
+## Requeriments
+
+Nodejs 6+
+
+
 ### Current Version : v0.1.0
+
 
 
 ## Supported Browsers:
