@@ -1,25 +1,4 @@
 {
-<<<<<<< HEAD
-    "name": "socket",
-    "version": "1.0.0",
-    "description": "App bridge-socket-ioT",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
-    },
-    "author": "juscilan.com",
-    "license": "ISC",
-    "dependencies": {
-        "body-parser": "^1.15.0",
-        "express": "^4.13.4",
-        "socket.io": "^1.4.5"
-    },
-    "devDependencies": {
-        "eslint-config-airbnb-base": "^11.3.1",
-        "eslint-plugin-import": "^2.7.0"
-    }
-=======
   "name": "socket",
   "version": "1.0.0",
   "description": "App bridge-socket-ioT",
@@ -35,5 +14,4 @@
     "express": "^4.14.0",
     "socket.io": "^1.4.8"
   }
->>>>>>> 97abae4a9a83a4dfddce44fb719c8127ce79ae02
 }
