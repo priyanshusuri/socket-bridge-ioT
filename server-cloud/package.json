@@ -1,11 +1,11 @@
 {
-  "name": "socket",
+  "name": "socket-cloud",
   "version": "1.0.0",
-  "description": "App bridge-socket-ioT",
-  "main": "index.js",
+  "description": "App bridge-socket-ioT raspberry version",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "author": "juscilan.com",
   "license": "ISC",
