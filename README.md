@@ -7,6 +7,7 @@ Socket-bridge-ioT
 
 Nodejs 6+
 
+sudo apt-get install python g++ make
 
 ### Current Version : v0.1.0
 
